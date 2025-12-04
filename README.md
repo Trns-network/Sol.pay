@@ -1,2 +1,0 @@
-# Sol.pay
-Solana chain
